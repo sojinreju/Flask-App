@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scrape Reviews - Review Analyzer</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-image: url('static/sample1.jpg');
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            background-color: #bcbcbc;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 600px;
+        }
+        h1 {
+            color: #343a40;
+            text-align: center;
+            font-size: 28px;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #495057;
+        }
+        input[type="url"], textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            box-sizing: border-box;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        input:focus, textarea:focus {
+            border-color: #6a11cb;
+            outline: none;
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+        }
+        button {
+            background-color: #6a11cb;
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #5a0fb0;
+        }
+        .error {
+            color: #dc3545;
+            text-align: center;
+            margin-top: 15px;
+            background-color: #f8d7da;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #f5c6cb;
+            font-size: 14px;
+        }
+        .logout {
+            background-color: #dc3545;
+            margin-top: 15px;
+        }
+        .logout:hover {
+            background-color: #c82333;
+        }
+        .info {
+            text-align: center;
+            color: #6c757d;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Product Review Analyzer</h1>
+        <div class="info">
+            Supported Platforms: Amazon India, Flipkart, Manual Input
+        </div>
+        <form action="/scrape" method="POST">
+            <div class="form-group">
+                <label for="url">Product URL (Optional)</label>
+                <input type="url" id="url" name="url" 
+                       placeholder="Enter Amazon or Flipkart product URL">
+            </div>
+            <div class="form-group">
+                <label for="manual_reviews">Or Paste Reviews Manually</label>
+                <textarea id="manual_reviews" name="manual_reviews" 
+                          placeholder="Paste reviews here (one review per line)"></textarea>
+            </div>
+            <div class="button-group">
+                <button type="submit" name="action" value="scrape">Scrape Reviews</button>
+                <button type="submit" name="action" value="analyze">Analyze Reviews</button>
+            </div>
+            {% if error %}
+            <div class="error">{{ error }}</div>
+            {% endif %}
+        </form>
+        <button class="logout" onclick="window.location.href='/logout'">Logout</button>
+    </div>
+</body>
+</html>

@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reviews - Review Analyzer</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-image: url('static/sample1.jpg');
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            background-color: #bcbcbc;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 900px;
+        }
+        h1 {
+            color: #343a40;
+            text-align: center;
+            font-size: 28px;
+            margin-bottom: 20px;
+        }
+        .review {
+            border: 1px solid #ddd;
+            margin: 15px 0;
+            padding: 20px;
+            border-radius: 8px;
+            background-color: #f8f9fa;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s;
+        }
+        .review:hover {
+            transform: scale(1.02);
+        }
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .reviewer {
+            font-weight: bold;
+            color: #495057;
+        }
+        .date {
+            color: #6c757d;
+            font-size: 14px;
+        }
+        .rating {
+            color: #ffc107;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .title {
+            font-size: 18px;
+            margin: 10px 0;
+            color: #343a40;
+            font-weight: bold;
+        }
+        .text {
+            color: #555555;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+        .verified {
+            color: #28a745;
+            font-size: 14px;
+            font-style: italic;
+        }
+        button {
+            background-color: #6a11cb;
+            color: white;
+            padding: 10px 15px; /* Adjusted padding for smaller buttons */
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+            width: 45%; /* Set a specific width for equal size */
+            margin: 5px; /* Added margin to separate buttons */
+        }
+        button:hover {
+            background-color: #5a0fb0;
+        }
+        .buttons {
+            margin-top: 30px;
+            display: flex;
+            justify-content: space-between; /* Space between buttons */
+        }
+        .back {
+            background-color: #6c757d;
+        }
+        .back:hover {
+            background-color: #5a6268;
+        }
+        .logout {
+            background-color: #dc3545;
+        }
+        .logout:hover {
+            background-color: #c82333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Scraped Reviews</h1>
+        {% for review in reviews %}
+        <div class="review">
+            <div class="review-header">
+                <span class="reviewer">{{ review.reviewer }}</span>
+                <span class="date">{{ review.date }}</span>
+            </div>
+            <div class="rating">Rating: {{ review.rating }}</div>
+            {% if review.verified %}
+            <div class="verified">Verified Purchase</div>
+            {% endif %}
+            <div class="title">{{ review.title }}</div>
+            <div class="text">{{ review.text }}</div>
+            <button onclick="window.location.href='/analyze/{{ loop.index0 }}'">
+                Analyze Review
+            </button>
+        </div>
+        {% endfor %}
+        <div class="buttons">
+            <button class="back" onclick="window.location.href='/scrape'">New Scrape</button>
+            <button class="logout" onclick="window.location.href='/logout'">Logout</button>
+        </div>
+    </div>
+</body>
+</html>

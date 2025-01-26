@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analysis Results - Review Analyzer</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-image: url('static/sample1.jpg');
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            background-color: #bcbcbc;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 900px;
+        }
+        h1 {
+            color: #343a40;
+            text-align: center;
+            font-size: 28px;
+            margin-bottom: 20px;
+        }
+        h2 {
+            text-align: center;
+            margin: 10px 0;
+            font-size: 24px;
+            color: #495057;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        .genuine {
+            background-color: #dff0d8;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .fake {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .confidence-bar {
+            height: 20px;
+            background-color: #e9ecef;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+        .confidence-fill {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
+        .genuine .confidence-fill {
+            background-color: #4CAF50;
+        }
+        .fake .confidence-fill {
+            background-color: #dc3545;
+        }
+        .features {
+            margin-top: 20px;
+            display: flex; /* Changed to flex for a single row */
+            flex-wrap: wrap; /* Allow wrapping if necessary */
+            gap: 20px; /* Space between boxes */
+        }
+        .feature-card {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+            text-align: center;
+            flex: 1 1 200px; /* Allow flexible sizing with a minimum width */
+            transition: transform 0.3s;
+        }
+        .feature-card:hover {
+            transform: scale(1.05);
+        }
+        .feature-title {
+            font-weight: bold;
+            font-size: 16px;
+            margin-bottom: 10px;
+            color: #495057;
+        }
+        .feature-value {
+            color: #6c757d;
+            font-size: 14px;
+        }
+        .buttons {
+            margin-top: 30px;
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+        }
+        button {
+            background-color: #6a11cb;
+            color: #ffffff;
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            flex: 1;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #5a0fb0;
+        }
+        .back {
+            background-color: #6c757d;
+        }
+        .back:hover {
+            background-color: #5a6268;
+        }
+        .logout {
+            background-color: #dc3545;
+        }
+        .logout:hover {
+            background-color: #c82333;
+        }
+        #pieChart {
+            max-width: 243px; /* Reduced from 270px to 243px */
+            margin: 20px auto;
+        }
+        canvas {
+            width: 100% !important;
+            height: auto !important;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Analysis Results</h1>
+        <div id="result" class="result {{ result.prediction.lower() }}">
+            <h2>{{ result.prediction }} Review</h2>
+            <div class="confidence-bar">
+                <div class="confidence-fill" style="width: {{ result.confidence * 100 }}%"></div>
+            </div>
+            <p style="text-align: center; font-weight: bold;">Confidence: {{ "%.1f"|format(result.confidence * 100) }}%</p>
+            <div id="pieChart">
+                <canvas id="confidencePieChart"></canvas>
+            </div>
+            <div class="features">
+    <h3 style="text-align: center; color: #343a40;">What These Parameters Mean</h3>
+    <p style="text-align: center; color: #6c757d; font-size: 14px; margin-bottom: 30px;">
+        Below are various attributes analyzed from the review. These metrics help determine the review's authenticity.
+    </p>
+    
+    <!-- Text Statistics Section -->
+    <div class="feature-card">
+        <div class="feature-title">Text Statistics</div>
+        <p class="feature-value" style="font-style: italic; color: #495057;">
+            Basic characteristics of the text, such as its length, number of sentences, and average word length. 
+            These metrics provide insights into the overall structure of the review.
+        </p>
+        <div class="feature-value">
+            Length: {{ result.features.text_stats.length }}<br>
+            Sentences: {{ result.features.text_stats.num_sentences }}<br>
+            Avg Word Length: {{ "%.2f"|format(result.features.text_stats.avg_word_length) }}
+        </div>
+    </div>
+
+    <!-- Style Markers Section -->
+    <div class="feature-card">
+        <div class="feature-title">Style Markers</div>
+        <p class="feature-value" style="font-style: italic; color: #495057;">
+            Indicators of the writing style, such as the use of exclamations, questions, and capital letters. 
+            These markers can reveal patterns typical of genuine or fake reviews.
+        </p>
+        <div class="feature-value">
+            Exclamations: {{ result.features.style_markers.exclamations }}<br>
+            Questions: {{ result.features.style_markers.questions }}<br>
+            Capitals Ratio: {{ "%.1f"|format(result.features.style_markers.capitals_ratio * 100) }}%
+        </div>
+    </div>
+
+    <!-- Linguistic Analysis Section -->
+    <div class="feature-card">
+        <div class="feature-title">Linguistic Analysis</div>
+        <p class="feature-value" style="font-style: italic; color: #495057;">
+            Focuses on language features like the use of adjectives and adverbs, which can signal exaggeration or subjectivity in reviews.
+        </p>
+        <div class="feature-value">
+            Adjective Ratio: {{ "%.1f"|format(result.features.linguistic_analysis.adj_ratio * 100) }}%<br>
+            Adverb Ratio: {{ "%.1f"|format(result.features.linguistic_analysis.adv_ratio * 100) }}%
+        </div>
+    </div>
+
+    <!-- Sentiment Analysis Section -->
+    <div class="feature-card">
+        <div class="feature-title">Sentiment Analysis</div>
+        <p class="feature-value" style="font-style: italic; color: #495057;">
+            Measures the overall sentiment (positive or negative) and intensity of the review's tone. 
+            Sentiment analysis helps gauge the emotional impact of the text.
+        </p>
+        <div class="feature-value">
+            Score: {{ "%.2f"|format(result.features.sentiment.score) }}<br>
+            Intensity: {{ "%.2f"|format(result.features.sentiment.intensity) }}
+        </div>
+    </div>
+</div>
+
+        </div>
+        <div class="buttons">
+            <button class="back" onclick="window.location.href='/scrape'">New Analysis</button>
+            <button class="back" onclick="window.location.href='/reviews'">Back to Review Page</button>
+            <button class="logout" onclick="window.location.href='/logout'">Logout</button>
+        </div>
+    </div>
+    <script>
+        const ctx = document.getElementById('confidencePieChart').getContext('2d');
+        const confidence = {{ result.confidence }};
+        const fakeConfidence = 1 - confidence;
+
+        const confidencePieChart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: ['Genuine', 'Fake'],
+                datasets: [{
+                    data: [confidence, fakeConfidence],
+                    backgroundColor: ['#4CAF50', '#dc3545'],
+                    borderColor: ['#fff', '#fff'],
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(tooltipItem) {
+                                return tooltipItem.label + ': ' + (tooltipItem.raw * 100).toFixed(1) + '%';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
