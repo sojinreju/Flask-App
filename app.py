@@ -38,7 +38,7 @@ def save_users(users):
 
 @app.route('/')
 def index():
-    return redirect(url_for('login'))
+    return redirect(url_for('index'))
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -65,8 +65,8 @@ def register():
     
     return render_template('register.html')
 
-@app.route('/login', methods=['GET', 'POST'])
-def login():
+@app.route('/index', methods=['GET', 'POST'])
+def index():
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
@@ -74,21 +74,21 @@ def login():
         users = load_users()
         
         if username not in users:
-            return render_template('login.html', error="User not found")
+            return render_template('index.html', error="User not found")
         
         if check_password_hash(users[username], password):
             session['logged_in'] = True
             session['username'] = username
             return redirect(url_for('scrape'))
         
-        return render_template('login.html', error="Invalid password")
+        return render_template('index.html', error="Invalid password")
     
-    return render_template('login.html')
+    return render_template('index.html')
 
 @app.route('/scrape', methods=['GET', 'POST'])
 def scrape():
     if 'logged_in' not in session:
-        return redirect(url_for('login'))
+        return redirect(url_for('index'))
     
     if request.method == 'GET':
         session.pop('reviews', None)
@@ -135,7 +135,7 @@ def scrape():
 @app.route('/reviews')
 def reviews():
     if 'logged_in' not in session:
-        return redirect(url_for('login'))
+        return redirect(url_for('index'))
     
     reviews = session.get('reviews', [])
     if not reviews:
@@ -146,7 +146,7 @@ def reviews():
 @app.route('/analyze/<int:review_index>')
 def analyze_review(review_index):
     if 'logged_in' not in session:
-        return redirect(url_for('login'))
+        return redirect(url_for('index'))
     
     reviews = session.get('reviews', [])
     if not reviews or review_index >= len(reviews):
@@ -161,7 +161,7 @@ def analyze_review(review_index):
 @app.route('/result')
 def result():
     if 'logged_in' not in session:
-        return redirect(url_for('login'))
+        return redirect(url_for('index'))
     
     analysis_result = session.get('analysis_result')
     if not analysis_result:
@@ -172,8 +172,8 @@ def result():
 @app.route('/logout')
 def logout():
     session.clear()
-    return redirect(url_for('login'))
+    return redirect(url_for('index'))
 
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))  # Default to 5000 if PORT not set
-    app.run(host='0.0.0.0', port=port)
+    app.debug = True
+    app.run(port=5000)
